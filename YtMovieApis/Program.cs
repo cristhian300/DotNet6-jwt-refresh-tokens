@@ -13,8 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
 // For Entity Framework  
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+builder.Services.AddSwaggerGen();
 
 // For Identity  
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -28,6 +31,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+
 
 // Adding Jwt Bearer  
 .AddJwtBearer(options =>
@@ -45,11 +49,20 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
 builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddTransient<IAuthorizaService, AuthorizationService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 app.UseHttpsRedirection();
 app.UseCors(options =>

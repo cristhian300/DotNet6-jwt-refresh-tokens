@@ -1,6 +1,6 @@
 ﻿namespace YtMovieApis.Models.DTO
 {
-    public class LoginResponse : Status
+    public class LoginResponse  
     {
         public string Token { get; set; }
         public string RefreshToken { get; set; }

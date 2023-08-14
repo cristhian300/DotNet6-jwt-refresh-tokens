@@ -9,16 +9,16 @@ using YtMovieApis.Repositories.Domain;
 
 namespace YtMovieApis.Controllers
 {
-    [Route("api/[controller]/{action}")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class TokenController : ControllerBase
     {
         private readonly DatabaseContext _ctx;
-        private readonly ITokenService _service;
+        private readonly ITokenService _serviceToken;
         public TokenController(DatabaseContext ctx,ITokenService service)
         {
             this._ctx = ctx;
-            this._service = service;
+            this._serviceToken = service;
 
         }
 
@@ -29,13 +29,16 @@ namespace YtMovieApis.Controllers
                 return BadRequest("Invalid client request");
             string accessToken = tokenApiModel.AccessToken;
             string refreshToken = tokenApiModel.RefreshToken;
-            var principal = _service.GetPrincipalFromExpiredToken(accessToken);
+
+            var principal = _serviceToken.GetPrincipalFromExpiredToken(accessToken);
             var username = principal.Identity.Name;
+
             var user = _ctx.TokenInfo.SingleOrDefault(u => u.Usename == username);
             if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.Now)
                 return BadRequest("Invalid client request");
-            var newAccessToken = _service.GetToken(principal.Claims);
-            var newRefreshToken = _service.GetRefreshToken();
+
+            var newAccessToken = _serviceToken.GetToken(principal.Claims);
+            var newRefreshToken = _serviceToken.GetRefreshToken();
             user.RefreshToken = newRefreshToken;
             _ctx.SaveChanges();
             return Ok(new RefreshTokenRequest()

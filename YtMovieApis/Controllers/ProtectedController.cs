@@ -10,6 +10,7 @@ namespace YtMovieApis.Controllers
     [Authorize]
     public class ProtectedController : ControllerBase
     {
+        [NonAction]
         public IActionResult GetData()
         {
             var status = new Status();
